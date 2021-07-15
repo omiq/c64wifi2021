@@ -6,6 +6,8 @@ Starts in 300 baud
 at? to get help
 
 ## AT COMMAND SUMMARY:
+
+```
 DIAL HOST.....: ATDTHOST:PORT
 SPEED DIAL....: ATDSN (N=0-9)
 SET SPEED DIAL: AT&ZN=HOST:PORT (N=0-9)
@@ -30,4 +32,4 @@ WIFI OFF/ON...: ATC0 / ATC1
 HANGUP........: ATH
 ENTER CMD MODE: +++
 EXIT CMD MODE.: ATO
-
+```
