@@ -1,3 +1,4 @@
+![c64-esp8266-wifi 007](https://user-images.githubusercontent.com/3143825/126214417-67539717-4127-490d-b01c-4b847225f335.jpeg)
 # c64wifi2021
 ESP8266 WiFi for C64 that compiles without errors
 
