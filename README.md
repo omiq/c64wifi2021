@@ -2,6 +2,8 @@
 # c64wifi2021
 ESP8266 WiFi for C64 that compiles without errors
 
+[C64 WiFi Tutorial and more details here](https://retrogamecoders.com/commodore-64-wifi-esp8266/)
+
 Starts in 300 baud
 
 at? to get help
