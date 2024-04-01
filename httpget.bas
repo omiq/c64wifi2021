@@ -1,32 +1,40 @@
-rem The WiFi adapter defaults to 300 baud but use serial 1200,8n1 - AT$SB=1200
-rem open the serial from user port
-open2,2,4,chr$(8)+chr$(0)
-get#2,s$: print#2,""
-gosub response:
-print#2,"AT$SSID=YOUR_WIFI_NAME" + chr$(10) + chr$(13)
-gosub response:
-print#2,"AT$PASS=WIFI_PASSWORD" + chr$(10) + chr$(13)
-gosub response:
-print#2,"ATC1" + chr$(10) + chr$(13)
-gosub response:
+#lowercase
+POKE 53272,23
+print "{clear}{white}"
+open2,2,4,chr$(8)+chr$(0):rem open the serial from user port
+
+print#2,"at":gosub transmit
+print#2,"atc1":gosub transmit
+print#2,"ati":gosub transmit
+
+for i = 1 to 10
+gosub response
+next
 
 
 main:
 print "{clear}{white}wled"
 print "select 1, 2 or 3"
 selection:
-get i$: if i$ = "" goto selection:
-if i$="1" then print#2,"http://192.168.0.102/win&A=64&PL=1"  + chr$(10) + chr$(13): rem my scrolling message
-if i$="2" then print#2,"http://192.168.0.102/win&A=64&PL=2"  + chr$(10) + chr$(13): rem 
-if i$="3" then print#2,"http://192.168.0.102/win&A=64&PL=3"  + chr$(10) + chr$(13): rem 
-gosub response: rem get the response
-goto main: rem loop back to start of the main loop again
+u$="": get i$
+if i$="1" then print "1 selected": u$="atgethttp://192.168.0.100/WIN&a=64&pl=1": gosub transmit
+if i$="2" then print "2 selected": u$="atgethttp://192.168.0.100/WIN&a=64&pl=2": gosub transmit 
+if i$="3" then print "3 selected": u$="atgethttp://192.168.0.100/WIN&a=64&pl=3": gosub transmit
+goto selection: rem loop back to start of the main loop again
 
-response:
+
+transmit:
+print#2,u$ + chr$(13)
+print ""
+waiting:
+if PEEK(673) AND 1 then print ".";: goto waiting: rem still transmitting
+for w=1 to 2000: next
+
 rem get the response until nothing waiting
- get#2,s$: print s$;:rem print these bytes
- if s$<>"" then goto response:rem keep going until no bytes waiting
- for w=1 to 2000:next
- return
+response:
+get#2,s$:if s$<>"" then print s$;:goto response 
+for w=1 to 2000: next
+return
+ 
  rem ---------------------------------
  close 2:end

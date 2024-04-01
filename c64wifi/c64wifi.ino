@@ -55,7 +55,7 @@
 #define CTS_PIN 5         // CTS Clear to Send, connect to host's RTS pin
 
 // Global variables
-String build = "c64wifi2021";
+String build = "C64WIFI2024";
 String welcome_message = build;
 String cmd = "";           // Gather a new AT command to this string from serial
 bool cmdMode = true;       // Are we in AT command mode or connected mode
@@ -89,7 +89,7 @@ byte ringCount = 0;
 String resultCodes[] = { "OK", "CONNECT", "RING", "NO CARRIER", "ERROR", "", "NO DIALTONE", "BUSY", "NO ANSWER" };
 enum resultCodes_t { R_OK, R_CONNECT, R_RING, R_NOCARRIER, R_ERROR, R_NONE, R_NODIALTONE, R_BUSY, R_NOANSWER };
 unsigned long connectTime = 0;
-bool petTranslate = false; // Fix PET MCTerm 1.26C Pet->ASCII encoding to actual ASCII
+bool petTranslate = true; // Fix PET MCTerm 1.26C Pet->ASCII encoding to actual ASCII
 bool hex = false;
 enum flowControl_t { F_NONE, F_HARDWARE, F_SOFTWARE };
 byte flowControl = F_NONE;      // Use flow control
