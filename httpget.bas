@@ -1,8 +1,6 @@
 #lowercase
 POKE 53272,23
-
-
-print "{clear}{white}"
+PRINT CHR$(5): PRINT CHR$(147): PRINT CHR$(19);: REM CLEAR SCREEN, WHITE TEXT
 open2,2,4,chr$(8)+chr$(0):rem open the serial from user port
 
 print "starting"
@@ -64,6 +62,6 @@ return
  
 instructions:
 print chr$(147)
-print "{clear}{white}wled"
+PRINT CHR$(5): PRINT CHR$(147): PRINT CHR$(19);: REM CLEAR SCREEN, WHITE TEXT
 print "select 1, 2 or 3"
 RETURN
