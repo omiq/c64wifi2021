@@ -1,8 +1,11 @@
 #lowercase
 POKE 53272,23
+
 show:
 print "{clear}{white}"
 open2,2,4,chr$(8)+chr$(0):rem open the serial from user port
+
+if i$<>"" then goto selection
 
 print "starting"
 print#2,"at":gosub transmit
@@ -40,6 +43,8 @@ for i = 1 to 5
 gosub response
 NEXT
 close 2
+print fre(1)
+i$=">"
 goto show
 
 transmit:
@@ -65,4 +70,3 @@ print "{clear}{white}wled"
 print "select 1, 2 or 3"
 RETURN
 
-end
