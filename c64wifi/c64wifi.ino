@@ -74,7 +74,7 @@ char plusCount = 0;        // Go to AT mode at "+++" sequence, that has to be co
 unsigned long plusTime = 0;// When did we last receive a "+++" sequence
 #define LED_TIME 15         // How many ms to keep LED on at activity
 unsigned long ledTime = 0;
-#define TX_BUF_SIZE 256    // Buffer where to read from serial before writing to TCP
+#define TX_BUF_SIZE 4096    // Buffer where to read from serial before writing to TCP
 // (that direction is very blocking by the ESP TCP stack,
 // so we can't do one byte a time.)
 uint8_t txBuf[TX_BUF_SIZE];
@@ -89,7 +89,7 @@ byte ringCount = 0;
 String resultCodes[] = { "OK", "CONNECT", "RING", "NO CARRIER", "ERROR", "", "NO DIALTONE", "BUSY", "NO ANSWER" };
 enum resultCodes_t { R_OK, R_CONNECT, R_RING, R_NOCARRIER, R_ERROR, R_NONE, R_NODIALTONE, R_BUSY, R_NOANSWER };
 unsigned long connectTime = 0;
-bool petTranslate = true; // Fix PET MCTerm 1.26C Pet->ASCII encoding to actual ASCII
+bool petTranslate = false; // Fix PET MCTerm 1.26C Pet->ASCII encoding to actual ASCII
 bool hex = false;
 enum flowControl_t { F_NONE, F_HARDWARE, F_SOFTWARE };
 byte flowControl = F_NONE;      // Use flow control
