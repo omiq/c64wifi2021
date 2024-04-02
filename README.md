@@ -1,6 +1,9 @@
+# c64wifi2024
+ESP8266 WiFi for C64 **WITH SSL** that compiles without errors
+
+### Updated in 2024 to allow https as well as plain http GET
+
 ![c64-esp8266-wifi 007](https://user-images.githubusercontent.com/3143825/126214417-67539717-4127-490d-b01c-4b847225f335.jpeg)
-# c64wifi2021
-ESP8266 WiFi for C64 that compiles without errors
 
 [C64 WiFi Tutorial and more details here](https://retrogamecoders.com/commodore-64-wifi-esp8266/)
 
