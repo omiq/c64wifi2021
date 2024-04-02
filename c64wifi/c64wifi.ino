@@ -1239,7 +1239,7 @@ void command()
   {
     
     String URL = cmd.substring(5, cmd.length());
-    tcpClient.print(wget(URL));
+    Serial.print(wget(URL));
 
   }
 

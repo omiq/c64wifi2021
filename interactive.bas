@@ -1,9 +1,10 @@
-#uppercase
-rem POKE 53272,23
+#lowercase
+POKE 53272,23
+PRINT CHR$(5): PRINT CHR$(147): PRINT CHR$(19);: REM CLEAR SCREEN, WHITE TEXT
 print "{clear}{white}"
 
 open2,2,4,chr$(8)+chr$(0):rem open the serial from user port
-print#2,"ATE0"
+print#2,"ATE1"
 for i = 1 to 10
 get#2,s$
 print s$;
