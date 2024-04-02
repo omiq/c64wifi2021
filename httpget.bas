@@ -10,20 +10,6 @@ for i = 1 to 5
 gosub response
 NEXT
 
-print "connecting to wifi"
-print#2,"atc1":gosub transmit
-
-for i = 1 to 5
-gosub response
-NEXT
-
-show:
-print "getting connection info"
-print#2,"ati":gosub transmit
-
-for i = 1 to 10
-gosub response
-next
 
 showinstructs:
 gosub instructions
@@ -34,7 +20,7 @@ if i$="1" then print "1 selected": u$="atgethttp://192.168.0.103/WIN&a=64&pl=1":
 if i$="2" then print "2 selected": u$="atgethttp://192.168.0.103/WIN&a=64&pl=2": gosub transmit 
 if i$="3" then print "3 selected": u$="atgethttp://192.168.0.103/WIN&a=64&pl=3": gosub transmit
 if i$="4" then print "4 selected": u$="atgethttps://hook.eu2.make.com/AD3MIE2EHS5UUHJO3N630YUT9GUHIWJ1?message=c64+basic": gosub transmit
-if i$="5" then print "5 selected": u$="atgetHTTPS://TIMEAPI.IO/API/TIMEZONE/ZONE?TIMEZONE=EUROPE/LONDON": gosub transmit
+if i$="5" then print "5 selected": u$="atgetHTTPS://TIMEAPI.IO/API/TIMEZONE/ZONE?TIMEZONE=EUROPE/LONDON": gosub gettime
 
 
 if i$ = "" then goto selection: rem loop back to start of the main loop again
@@ -63,6 +49,41 @@ response:
 get#2,s$:if s$<>"" then print s$;:goto response
 for w=1 to 2000: next
 return
+
+
+rem get the url and then
+rem parse the result from timeapi
+gettime:
+print#2,u$ + chr$(10)+chr$(13);:u$=""
+print ""
+
+waitfortime:
+if PEEK(673) AND 1 then print ".";: goto waitfortime: rem still transmitting
+
+rem get the time 
+cc=0 : rem the api will return more chars that we can use
+ts$ = "": nw$=""
+parsetime:
+get#2,s$:if s$<>"" and cc < 255 then ts$ = ts$ + s$:cc=cc+1:goto parsetime
+nw$=mid$(ts$,176,22): ts$=""
+for c = 1 to len(nw$)
+c$ = mid$(nw$,c,1)
+if c$="t" then i=c
+NEXT
+
+h$=mid$(nw$,i+1,2)
+m$=mid$(nw$,i+4,2)
+s$=mid$(nw$,i+7,2)
+print ""
+print h$ + ":" + m$ + ":" + s$
+print ""
+if val(h$)<25 and val(m$) < 60 and val(s$)<60 then time$ = h$ + m$ + s$
+leftoverbytes:
+get#2,s$:if s$<>"" then goto leftoverbytes
+for w=1 to 2000: next
+return
+
+
  
 instructions:
 PRINT CHR$(5): PRINT CHR$(147): PRINT CHR$(19);: REM CLEAR SCREEN, WHITE TEXT
