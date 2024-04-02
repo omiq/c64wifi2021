@@ -25,20 +25,24 @@ for i = 1 to 10
 gosub response
 next
 
-
+showinstructs:
 gosub instructions
 
 selection:
 u$="": i$="": get i$
-if i$="1" then print "1 selected": u$="atgethttp://192.168.0.100/WIN&a=64&pl=1": gosub transmit
-if i$="2" then print "2 selected": u$="atgethttp://192.168.0.100/WIN&a=64&pl=2": gosub transmit 
-if i$="3" then print "3 selected": u$="atgethttp://192.168.0.100/WIN&a=64&pl=3": gosub transmit
+if i$="1" then print "1 selected": u$="atgethttp://192.168.0.103/WIN&a=64&pl=1": gosub transmit
+if i$="2" then print "2 selected": u$="atgethttp://192.168.0.103/WIN&a=64&pl=2": gosub transmit 
+if i$="3" then print "3 selected": u$="atgethttp://192.168.0.103/WIN&a=64&pl=3": gosub transmit
+if i$="4" then print "4 selected": u$="atgethttps://hook.eu2.make.com/AD3MIE2EHS5UUHJO3N630YUT9GUHIWJ1?message=c64+basic": gosub transmit
+if i$="5" then print "5 selected": u$="atgetHTTPS://TIMEAPI.IO/API/TIMEZONE/ZONE?TIMEZONE=EUROPE/LONDON": gosub transmit
+
 
 if i$ = "" then goto selection: rem loop back to start of the main loop again
 
 for i = 1 to 5
 gosub response
 NEXT
+goto showinstructs:
 
 close 2: end
 
@@ -61,7 +65,8 @@ for w=1 to 2000: next
 return
  
 instructions:
-print chr$(147)
 PRINT CHR$(5): PRINT CHR$(147): PRINT CHR$(19);: REM CLEAR SCREEN, WHITE TEXT
-print "select 1, 2 or 3"
+print "select 1, 2 or 3 for led sequences"
+print "select 4 to send a message to iphone"
+print "select 5 current time from the internet"
 RETURN

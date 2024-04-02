@@ -2,7 +2,7 @@
     "name": "c64wifi2021",
     "description": "Project c64wifi2021",
     "toolkit": "basic",
-    "sources": ["interactive.bas"],
+    "sources": ["httpget.bas"],
     "build": "debug",
     "definitions": [],
     "includes": [],
