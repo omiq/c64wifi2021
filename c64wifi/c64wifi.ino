@@ -769,7 +769,8 @@ String wget(String URL) {
   String payload = "";
   Serial.println("Getting " + URL + "...");
 
-  if(URL.indexOf("https://")>=0) {
+
+  if(URL.indexOf("https://")>=0 || URL.indexOf("HTTPS://")>=0) {
     payload = httpsget(URL);
   }
   else
