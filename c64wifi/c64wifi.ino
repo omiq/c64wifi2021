@@ -1,16 +1,19 @@
 /*
-  c64wifi2021
+  c64wifi2024
   ===========
     
    Based on WiFi SIXFOUR (C) 2016 Paul Rickards <rickards@gmail.com> based on
    ESP8266 based virtual modem Copyright (C) 2016 Jussi Salin <salinjus@gmail.com>
 */
 
+#include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266WiFiMulti.h>
+#include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
 #include <ESP8266mDNS.h>
-
+#include <WiFiClientSecureBearSSL.h>
 
 #define VERSIONA 0
 #define VERSIONB 1
@@ -663,6 +666,122 @@ void handleRoot() {
   delay(100);
 }
 
+
+// Plain HTTP
+String httpget(String URL) {
+
+  String payload = "";
+  WiFiClient client;
+  HTTPClient http;
+
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.setURL(URL);
+  
+
+  if (http.begin(client, URL)) {  
+
+    // start connection and send HTTP header
+    int httpCode = http.GET();
+
+    // httpCode will be negative on error
+    if (httpCode > 0) {
+
+      // HTTP header has been send and Server response header has been handled
+      // Path found at server
+      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+        payload = http.getString();
+      }
+
+    } else {
+
+      Serial.printf("Failed with error: %s\n", http.errorToString(httpCode).c_str());
+    
+    }
+
+
+
+  } else {
+
+    Serial.printf("Unable to connect\n");
+
+  }
+    http.end();
+    return payload;
+
+
+}
+
+// Secure HTTPS
+String httpsget(String URL) {
+
+  String payload = "";
+  std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+
+  client->setInsecure();
+
+  HTTPClient https;
+  https.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+  // HTTPS connection
+  if (https.begin(*client, URL)) {  
+
+    // start connection and send HTTP header
+    int httpCode = https.GET();
+
+    // httpCode will be negative on error
+    if (httpCode > 0) {
+
+      // HTTP header has been send and Server response header has been handled
+      // Path found at server or there was a redirect:
+      if (httpCode == HTTP_CODE_OK) {
+        payload = https.getString();
+      }
+      else if(httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+
+          Serial.println("MOVED: ");
+          Serial.println(https.headers());
+
+      }
+
+    } else {
+      Serial.printf("Failed with error: %s\n", https.errorToString(httpCode).c_str());
+    }
+
+    https.end();
+
+
+  } else {
+
+    Serial.printf("Unable to connect\n");
+
+  }
+
+
+  return payload;
+
+}
+
+
+// Do http/https GET
+String wget(String URL) {
+
+
+  String payload = "";
+  Serial.println("Getting " + URL + "...");
+
+  if(URL.indexOf("https://")>=0) {
+    payload = httpsget(URL);
+  }
+  else
+  {
+    payload = httpget(URL);
+  }
+        
+
+  return payload;
+
+}
+
 /**
    Turn on the LED and store the time, so the LED will be shortly after turned off
 */
@@ -1117,56 +1236,10 @@ void command()
   /**** HTTP GET request ****/
   else if (upCmd.indexOf("ATGET") == 0)
   {
-    // From the URL, aquire required variables
-    // (12 = "ATGEThttp://")
-    int portIndex = cmd.indexOf(":", 12); // Index where port number might begin
-    int pathIndex = cmd.indexOf("/", 12); // Index first host name and possible port ends and path begins
-    int port;
-    String path, host;
-    if (pathIndex < 0)
-    {
-      pathIndex = cmd.length();
-    }
-    if (portIndex < 0)
-    {
-      port = 80;
-      portIndex = pathIndex;
-    }
-    else
-    {
-      port = cmd.substring(portIndex + 1, pathIndex).toInt();
-    }
-    host = cmd.substring(12, portIndex);
-    path = cmd.substring(pathIndex, cmd.length());
-    if (path == "") path = "/";
-    char *hostChr = new char[host.length() + 1];
-    host.toCharArray(hostChr, host.length() + 1);
+    
+    String URL = cmd.substring(5, cmd.length());
+    tcpClient.print(wget(URL));
 
-    // Establish connection
-    if (!tcpClient.connect(hostChr, port))
-    {
-      sendResult(R_NOCARRIER);
-      connectTime = 0;
-      callConnected = false;
-      setCarrier(callConnected);
-    }
-    else
-    {
-      sendResult(R_CONNECT);
-      connectTime = millis();
-      cmdMode = false;
-      callConnected = true;
-      setCarrier(callConnected);
-
-      // Send a HTTP request before continuing the connection as usual
-      String request = "GET ";
-      request += path;
-      request += " HTTP/1.1\r\nHost: ";
-      request += host;
-      request += "\r\nConnection: close\r\n\r\n";
-      tcpClient.print(request);
-    }
-    delete hostChr;
   }
 
   /**** Unknown command ****/
