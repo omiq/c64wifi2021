@@ -58,6 +58,7 @@
 #define CTS_PIN 5         // CTS Clear to Send, connect to host's RTS pin
 
 // Global variables
+String allowed = " \"!#$%&'/01234567890:;<=>?@abcdefghijklmnopqrstuvwxyz[£]ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
 String build = "C64WIFI2024";
 String welcome_message = build;
 String cmd = "";           // Gather a new AT command to this string from serial
@@ -674,6 +675,7 @@ String httpget(String URL) {
   WiFiClient client;
   HTTPClient http;
 
+  http.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
   http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
   http.setURL(URL);
   
@@ -721,6 +723,7 @@ String httpsget(String URL) {
 
   HTTPClient https;
   https.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  https.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36");
 
   // HTTPS connection
   if (https.begin(*client, URL)) {  
@@ -777,7 +780,16 @@ String wget(String URL) {
   {
     payload = httpget(URL);
   }
-        
+
+
+  for(int i=0; i<payload.length()-1; i++) {
+
+    // If not an allowed character, remove it
+    if(allowed.indexOf(payload.charAt(i))==-1) {
+      payload.setCharAt(i, ' ');
+    }
+
+  }
 
   return payload;
 
