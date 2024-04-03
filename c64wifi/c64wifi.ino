@@ -14,7 +14,7 @@
 #include <EEPROM.h>
 #include <ESP8266mDNS.h>
 #include <WiFiClientSecureBearSSL.h>
-
+#define isunicode(c) (((c)&0xc0)==0xc0)
 #define VERSIONA 0
 #define VERSIONB 1
 #define VERSION_ADDRESS 0    // EEPROM address
@@ -58,7 +58,8 @@
 #define CTS_PIN 5         // CTS Clear to Send, connect to host's RTS pin
 
 // Global variables
-String allowed = " \"!#$%&'/01234567890:;<=>?@abcdefghijklmnopqrstuvwxyz[£]ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
+String payload = "";
+String allowed = " .,\"!#$%&'/01234567890:;<=>?@abcdefghijklmnopqrstuvwxyz[£]ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
 String build = "C64WIFI2024";
 String welcome_message = build;
 String cmd = "";           // Gather a new AT command to this string from serial
@@ -671,7 +672,7 @@ void handleRoot() {
 // Plain HTTP
 String httpget(String URL) {
 
-  String payload = "";
+
   WiFiClient client;
   HTTPClient http;
 
@@ -692,6 +693,7 @@ String httpget(String URL) {
       // Path found at server
       if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
         payload = http.getString();
+        payload.trim();
       }
 
     } else {
@@ -716,7 +718,6 @@ String httpget(String URL) {
 // Secure HTTPS
 String httpsget(String URL) {
 
-  String payload = "";
   std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
 
   client->setInsecure();
@@ -759,41 +760,12 @@ String httpsget(String URL) {
 
   }
 
-
+  payload.trim();
   return payload;
 
 }
 
 
-// Do http/https GET
-String wget(String URL) {
-
-
-  String payload = "";
-  Serial.println("Getting " + URL + "...");
-
-
-  if(URL.indexOf("https://")>=0 || URL.indexOf("HTTPS://")>=0) {
-    payload = httpsget(URL);
-  }
-  else
-  {
-    payload = httpget(URL);
-  }
-
-
-  for(int i=0; i<payload.length()-1; i++) {
-
-    // If not an allowed character, remove it
-    if(allowed.indexOf(payload.charAt(i))==-1) {
-      payload.setCharAt(i, ' ');
-    }
-
-  }
-
-  return payload;
-
-}
 
 /**
    Turn on the LED and store the time, so the LED will be shortly after turned off
@@ -1251,7 +1223,44 @@ void command()
   {
     
     String URL = cmd.substring(5, cmd.length());
-    Serial.print(wget(URL));
+
+    Serial.println("Getting " + URL + "...");
+
+
+    if(URL.indexOf("https://")>=0 || URL.indexOf("HTTPS://")>=0) {
+      payload = httpsget(URL);
+    }
+    else
+    {
+       payload = httpget(URL);
+    }
+
+    int numchars = payload.length()-1;
+    for(int i=0; i<numchars; i++) {
+
+      // If not an allowed character, remove it
+      int ch = payload.charAt(i);
+ 
+
+      if(allowed.indexOf(ch)==-1)
+      {
+        payload.remove(i,1);
+        numchars--;
+      }
+
+      if(bitRead(ch, 8)==1)
+      {
+
+        payload.remove(i,5);
+        numchars-=5;
+      }
+
+    }
+   
+   
+   Serial.print(payload);
+
+    
 
   }
 
